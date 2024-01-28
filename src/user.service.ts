@@ -15,4 +15,9 @@ export class UserService {
     }
     return user;
   }
+
+  async createUser(spotifyId: string, email: string): Promise<string> {
+    const user = await this.userModel.create({ spotifyId, email });
+    return user.id;
+  }
 }
