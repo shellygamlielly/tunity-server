@@ -1,5 +1,8 @@
-export class UserDto {
-  email: string;
+import { IsEmail, IsNotEmpty } from 'class-validator';
 
+export class UserDto {
+  @IsEmail()
+  email: string;
+  @IsNotEmpty()
   spotifyId: string;
 }
