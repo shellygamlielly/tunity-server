@@ -3,14 +3,17 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { Song } from '../schemas/song.schema';
 import { Playlist } from '../schemas/playlist.schema';
-import { PlaylistDto } from '../dto/playlist-dto';
+import { CreatePlaylistDto } from '../dto/create-playlist-dto';
+import { SongDto } from 'src/dto/song-dto';
 
 @Injectable()
 export class SongService {
   constructor(@InjectModel(Song.name) private songModel: Model<Song>) {}
 
-  async getSongsCountForPlaylists(playlistIds: Array<ObjectId>): Promise<any> {
-    return await this.songModel.aggregate([
+  async getSongsCountForPlaylists(
+    playlistIds: Array<ObjectId>,
+  ): Promise<Record<string, number>> {
+    const result = await this.songModel.aggregate([
       {
         $match: {
           playlistId: { $in: playlistIds },
@@ -30,13 +33,37 @@ export class SongService {
         },
       },
     ]);
+    const playlistCounts: Record<string, number> = {};
+    result.forEach((item) => {
+      playlistCounts[item.playlistId.toString()] = item.count;
+    });
+
+    return playlistCounts;
+  }
+
+  async getSongs(playlistId: string): Promise<SongDto[]> {
+    const songs = await this.songModel.find({ playlistId }).exec();
+    return songs.map((song) => ({
+      spotifySongId: song.spotifySongId,
+      name: song.name,
+      playlistId: song.id,
+      albumCoverUrl: song.albumCoverUrl,
+      voters: song.voters,
+    }));
   }
 
   async addSongToPlaylist(
     playlistId: string,
     spotifySongId: string,
+    name: string,
+    albumCoverUrl: string,
   ): Promise<ObjectId> {
-    const song = await this.songModel.create({ playlistId, spotifySongId });
+    const song = await this.songModel.create({
+      playlistId,
+      spotifySongId,
+      name,
+      albumCoverUrl,
+    });
     return song.id;
   }
 

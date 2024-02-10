@@ -12,6 +12,12 @@ export class Song {
   @Prop({ type: String, required: true })
   spotifySongId: string;
 
+  @Prop({ type: String, required: true })
+  name: string;
+
+  @Prop({ type: String })
+  albumCoverUrl: string;
+
   @Prop({ type: [String], default: [] })
   voters: string[];
 }

@@ -1,5 +1,7 @@
 export class SongDto {
   spotifySongId: string;
+  name: string;
   playlistId: string;
-  voters: [string];
+  albumCoverUrl: string;
+  voters: string[];
 }

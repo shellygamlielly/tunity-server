@@ -5,4 +5,6 @@ export class UserDto {
   email: string;
   @IsNotEmpty()
   spotifyId: string;
+  @IsNotEmpty()
+  userId: string;
 }

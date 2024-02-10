@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
-import { PlaylistDto } from '../dto/playlist-dto';
+import { CreatePlaylistDto } from '../dto/create-playlist-dto';
 import { Playlist } from 'src/schemas/playlist.schema';
 import { SongService } from 'src/song/song.service';
+import { PlaylistDto } from 'src/dto/playlist-dto';
 
 @Injectable()
 export class PlaylistService {
@@ -17,8 +18,23 @@ export class PlaylistService {
     return playlist.id;
   }
 
-  async getPlaylistsByOwnerId(ownerId: string): Promise<PlaylistDto[]> {
-    const playlists = await this.playlistModel.find({ ownerId }).exec();
+  async getPlaylistById(playlistId: string): Promise<PlaylistDto> {
+    const playlist = await this.playlistModel.findById(playlistId);
+
+    const songsInPlaylist = await this.songService.getSongs(playlistId);
+    return {
+      name: playlist.name,
+      playlistId: playlist.id,
+      maxTime: playlist.maxTimeSeconds,
+      songs: songsInPlaylist,
+    };
+  }
+
+  async getPlaylistsByOwnerId(ownerId: string): Promise<CreatePlaylistDto[]> {
+    const playlists = await this.playlistModel
+      .find({ ownerId })
+      .sort({ createdAt: -1 })
+      .exec();
     const playlistIds = playlists.map((playlist) => playlist.id);
     const songsCountMap =
       await this.songService.getSongsCountForPlaylists(playlistIds);
@@ -28,7 +44,7 @@ export class PlaylistService {
       playlistId: playlist.id,
       name: playlist.name,
       maxTime: playlist.maxTimeSeconds,
-      songsCount: songsCountMap[playlist.id] || 0, // Default to 0 if not found
+      songsCount: songsCountMap[playlist.id] || 0,
     }));
   }
 

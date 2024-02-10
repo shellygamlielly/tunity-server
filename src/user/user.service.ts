@@ -18,6 +18,7 @@ export class UserService {
     return {
       email: user.email,
       spotifyId: user.spotifyId,
+      userId: user.id,
     };
   }
 

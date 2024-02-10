@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { PlaylistService } from './playlist.service';
-import { PlaylistDto } from '../dto/playlist-dto';
+import { CreatePlaylistDto } from '../dto/create-playlist-dto';
+import { PlaylistDto } from 'src/dto/playlist-dto';
 
 @Controller('/playlist')
 export class PlaylistController {
@@ -9,12 +10,19 @@ export class PlaylistController {
   @Get('/:ownerId')
   async getPlaylistsByOwnerId(
     @Param('ownerId') ownerId: string,
-  ): Promise<PlaylistDto[]> {
+  ): Promise<CreatePlaylistDto[]> {
     return await this.playlistService.getPlaylistsByOwnerId(ownerId);
   }
 
+  @Get('/playlistId/:playlistId')
+  async getPlaylistById(
+    @Param('playlistId') playlistId: string,
+  ): Promise<PlaylistDto> {
+    return await this.playlistService.getPlaylistById(playlistId);
+  }
+
   @Post('')
-  async createPlaylist(@Body() createPlaylistDto: PlaylistDto) {
+  async createPlaylist(@Body() createPlaylistDto: CreatePlaylistDto) {
     return await this.playlistService.createPlaylist(
       createPlaylistDto.ownerId,
       createPlaylistDto.name,

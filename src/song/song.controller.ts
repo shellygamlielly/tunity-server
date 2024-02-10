@@ -12,6 +12,8 @@ export class SongController {
     const songId = await this.songService.addSongToPlaylist(
       songDto.playlistId,
       songDto.spotifySongId,
+      songDto.name,
+      songDto.albumCoverUrl,
     );
     return songId;
   }
