@@ -18,6 +18,11 @@ export class PlaylistService {
     return playlist.id;
   }
 
+  async removePlaylist(playlistId: string) {
+    await this.playlistModel.findByIdAndDelete(playlistId);
+    this.songService.removeSongsFromPlaylist(playlistId);
+  }
+
   async getPlaylistById(playlistId: string): Promise<PlaylistDto> {
     const playlist = await this.playlistModel.findById(playlistId);
 

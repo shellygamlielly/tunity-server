@@ -2,8 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { Song } from '../schemas/song.schema';
-import { Playlist } from '../schemas/playlist.schema';
-import { CreatePlaylistDto } from '../dto/create-playlist-dto';
 import { SongDto } from 'src/dto/song-dto';
 
 @Injectable()
@@ -75,6 +73,17 @@ export class SongService {
     if (!result.acknowledged) {
       console.error(
         `deleteOne of playlistId = ${playlistId}, spotifySongId = ${spotifySongId} not acknowledged.`,
+      );
+    }
+  }
+
+  async removeSongsFromPlaylist(playlistId: string) {
+    const result = await this.songModel.deleteMany({
+      playlistId,
+    });
+    if (!result.acknowledged) {
+      console.error(
+        `delete all songs of playlist with id = ${playlistId} not acknowledged.`,
       );
     }
   }
