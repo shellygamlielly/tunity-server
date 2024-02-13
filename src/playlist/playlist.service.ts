@@ -54,21 +54,10 @@ export class PlaylistService {
   }
 
   async getPlaylistsByUserId(userId: ObjectId) {
-    //any permission
+    //not just owner any permission
   }
 
-  async findPlaylistIdByName(
-    userId: string,
-    playlistName: string,
-  ): Promise<string> {
-    const playlist = await this.playlistModel
-      .findOne({ ownerId: userId, playlistName })
-      .exec();
-    if (!playlist) {
-      throw new NotFoundException(
-        `Playlist ${playlistName} of user : ${userId} was not found`,
-      );
-    }
-    return playlist.id;
+  async getPlaylistCollaborators(playlistId: ObjectId) {
+    //not just owner any permission
   }
 }

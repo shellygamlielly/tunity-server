@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { SongService } from './song.service';
 import { SongDto } from 'src/dto/song-dto';
 import { ObjectId } from 'mongoose';
@@ -18,7 +26,7 @@ export class SongController {
     return songId;
   }
 
-  @Post('/vote/:userId')
+  @Put('/vote/:userId')
   async addVoteToSong(
     @Body() songDto: SongDto,
     @Param('userId') userId: string,
@@ -38,7 +46,7 @@ export class SongController {
     await this.songService.removeSongFromPlaylist(playlistId, spotifySongId);
   }
 
-  @Delete('/Unvote/:userId')
+  @Delete('/unvote/:userId')
   async removeVoteToSong(
     @Body() songDto: SongDto,
     @Param('userId') userId: string,

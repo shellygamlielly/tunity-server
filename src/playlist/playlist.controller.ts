@@ -7,14 +7,14 @@ import { PlaylistDto } from 'src/dto/playlist-dto';
 export class PlaylistController {
   constructor(private readonly playlistService: PlaylistService) {}
 
-  @Get('/:ownerId')
+  @Get('ownerId/:ownerId')
   async getPlaylistsByOwnerId(
     @Param('ownerId') ownerId: string,
   ): Promise<CreatePlaylistDto[]> {
     return await this.playlistService.getPlaylistsByOwnerId(ownerId);
   }
 
-  @Get('/playlistId/:playlistId')
+  @Get('/:playlistId')
   async getPlaylistById(
     @Param('playlistId') playlistId: string,
   ): Promise<PlaylistDto> {
@@ -29,7 +29,7 @@ export class PlaylistController {
     );
   }
 
-  @Delete('/playlistId/:playlistId')
+  @Delete('/:playlistId')
   async removePlaylist(@Param('playlistId') playlistId: string): Promise<void> {
     await this.playlistService.removePlaylist(playlistId);
   }
