@@ -40,7 +40,10 @@ export class SongService {
   }
 
   async getSongs(playlistId: string): Promise<SongDto[]> {
-    const songs = await this.songModel.find({ playlistId }).exec();
+    const songs = await this.songModel
+      .find({ playlistId })
+      .sort({ createdAt: -1 })
+      .exec();
     return songs.map((song) => ({
       spotifySongId: song.spotifySongId,
       name: song.name,
