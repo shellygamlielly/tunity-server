@@ -47,7 +47,7 @@ export class SongService {
     return songs.map((song) => ({
       spotifySongId: song.spotifySongId,
       name: song.name,
-      playlistId: song.id,
+      playlistId: song.playlistId,
       albumCoverUrl: song.albumCoverUrl,
       voters: song.voters,
     }));
