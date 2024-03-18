@@ -10,11 +10,14 @@ import { PlaylistController } from './playlist/playlist.controller';
 import { SongController } from './song/song.controller';
 import { PlaylistService } from './playlist/playlist.service';
 import { SongService } from './song/song.service';
+import { MongoDBService } from './mongodb.service';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    MongooseModule.forRoot(process.env.MONGODB_URI),
+    MongooseModule.forRootAsync({
+      useClass: MongoDBService,
+    }),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MongooseModule.forFeature([
       { name: Playlist.name, schema: PlaylistSchema },
