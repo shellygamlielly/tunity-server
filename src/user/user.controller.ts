@@ -11,11 +11,11 @@ import { UserDto } from '../dto/user-dto';
 import { AuthInterceptor } from 'src/interceptors/auth.interceptors';
 
 @Controller('/user')
+@UseInterceptors(AuthInterceptor)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('spotify/:spotifyId')
-  @UseInterceptors(AuthInterceptor)
   async getuserBySpotifyId(
     @Param('spotifyId') spotifyId: string,
   ): Promise<UserDto> {

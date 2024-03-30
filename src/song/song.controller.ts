@@ -6,12 +6,15 @@ import {
   Param,
   Post,
   Put,
+  UseInterceptors,
 } from '@nestjs/common';
 import { SongService } from './song.service';
 import { SongDto } from 'src/dto/song-dto';
 import { ObjectId } from 'mongoose';
+import { AuthInterceptor } from 'src/interceptors/auth.interceptors';
 
 @Controller('/song')
+@UseInterceptors(AuthInterceptor)
 export class SongController {
   constructor(private readonly songService: SongService) {}
 
