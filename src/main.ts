@@ -11,8 +11,14 @@ async function bootstrap_aws(): Promise<Handler> {
   const expressApp = app.getHttpAdapter().getInstance();
   return serverlessExpress({ app: expressApp });
 }
+
 async function bootstrap_local() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors({
+    origin: 'http://localhost:5173',
+    methods: 'GET, POST, PUT, DELETE',
+    credentials: true,
+  });
   await app.listen(3001);
 }
 
@@ -24,8 +30,6 @@ export const handler: Handler = async (
   context: Context,
   callback: Callback,
 ) => {
-  if (process.env.NODE_ENV !== 'development') {
-    server = server ?? (await bootstrap_aws());
-    return server(event, context, callback);
-  }
+  server = server ?? (await bootstrap_aws());
+  return server(event, context, callback);
 };
