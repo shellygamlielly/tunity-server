@@ -13,8 +13,16 @@ export class PlaylistService {
     private readonly songService: SongService,
   ) {}
 
-  async createPlaylist(userId: string, name: string): Promise<string> {
-    const playlist = await this.playlistModel.create({ name, ownerId: userId });
+  async createPlaylist(
+    userId: string,
+    name: string,
+    imageUrl: string,
+  ): Promise<string> {
+    const playlist = await this.playlistModel.create({
+      name,
+      ownerId: userId,
+      imageUrl,
+    });
     return playlist.id;
   }
 
@@ -30,6 +38,7 @@ export class PlaylistService {
     return {
       name: playlist.name,
       playlistId: playlist.id,
+      imageUrl: playlist.imageUrl,
       maxTime: playlist.maxTimeSeconds,
       songs: songsInPlaylist,
     };
@@ -46,6 +55,7 @@ export class PlaylistService {
 
     return playlists.map((playlist) => ({
       ownerId: playlist.ownerId,
+      imageUrl: playlist.imageUrl,
       playlistId: playlist.id,
       name: playlist.name,
       maxTime: playlist.maxTimeSeconds,

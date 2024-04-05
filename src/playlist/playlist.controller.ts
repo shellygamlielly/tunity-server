@@ -26,6 +26,7 @@ export class PlaylistController {
     return await this.playlistService.createPlaylist(
       createPlaylistDto.ownerId,
       createPlaylistDto.name,
+      createPlaylistDto.imageUrl,
     );
   }
 
