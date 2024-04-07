@@ -25,3 +25,8 @@ jobs:
 
       - name: Build NestJS application with Webpack
         run: npm run webpack
+
+      - name: Print main.js Line Count
+        run: |
+          main_js_lines=$(wc -l < dist/main.js)
+          echo "Number of lines in main.js: $main_js_lines"
