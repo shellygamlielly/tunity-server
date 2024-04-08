@@ -33,14 +33,16 @@ jobs:
 
       - name: Create deployment zip file
         run: |
-          zip -r deployment.zip dist/main.js
+          zip deployment.zip dist/main.js
 
+      - name: ppp
+        run: echo ${{ secrets.AWS_REGION }}
       - name: Install and configure AWS CLI
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-north-1
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Deploy to Lambda
         run: |
