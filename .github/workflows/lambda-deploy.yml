@@ -3,7 +3,7 @@ name: Deployment Workflow
 on:
   push:
     branches:
-      - feature/aws-lambda
+      - master
 
 jobs:
   build:
