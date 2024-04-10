@@ -1,12 +1,13 @@
 import {
   CallHandler,
   ExecutionContext,
+  Injectable,
   NestInterceptor,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { UserService } from 'src/user/user.service';
-
+@Injectable()
 export class AuthInterceptor implements NestInterceptor {
   constructor(private readonly userService: UserService) {}
 
@@ -39,7 +40,9 @@ export class AuthInterceptor implements NestInterceptor {
       const spotifyProfileData = await spotifyProfileResponse.json();
       const spotifyUserId = spotifyProfileData.id;
 
-      req.userId = await this.userService.getUserBySpotifyId(spotifyUserId);
+      req.userId = (
+        await this.userService.getUserBySpotifyId(spotifyUserId)
+      ).userId;
 
       return handler.handle();
     } catch (error) {

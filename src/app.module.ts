@@ -11,6 +11,7 @@ import { SongController } from './song/song.controller';
 import { PlaylistService } from './playlist/playlist.service';
 import { SongService } from './song/song.service';
 import { MongoDBService } from './mongodb.service';
+import { AuthInterceptor } from './interceptors/auth.interceptors';
 
 @Module({
   imports: [
@@ -25,6 +26,6 @@ import { MongoDBService } from './mongodb.service';
     MongooseModule.forFeature([{ name: Song.name, schema: SongSchema }]),
   ],
   controllers: [UserController, PlaylistController, SongController],
-  providers: [UserService, PlaylistService, SongService],
+  providers: [AuthInterceptor, UserService, PlaylistService, SongService],
 })
 export class AppModule {}

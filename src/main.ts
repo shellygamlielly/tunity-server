@@ -19,7 +19,7 @@ async function bootstrap_local() {
     methods: 'GET, POST, PUT, DELETE',
     credentials: true,
   });
-  await app.listen(3001);
+  await app.listen(3000);
 }
 
 if (process.env.NODE_ENV === 'development') {
