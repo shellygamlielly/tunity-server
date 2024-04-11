@@ -41,9 +41,19 @@ export class SongService {
 
   async getSongs(playlistId: string): Promise<SongDto[]> {
     const songs = await this.songModel
-      .find({ playlistId })
-      .sort({ createdAt: -1 })
-      .exec();
+    .aggregate([
+      {$match: {
+        playlistId
+      }},
+      {
+        $addFields: {
+          votersCount: { $size: "$voters" }
+        }
+      },
+      {
+        $sort: { votersCount: -1, _id: 1 }
+    }
+    ]).exec();
     return songs.map((song) => ({
       spotifySongId: song.spotifySongId,
       name: song.name,
@@ -95,7 +105,7 @@ export class SongService {
     playlistId: string,
     spotifySongId: string,
     userId: string,
-  ): Promise<number> {
+  ): Promise<Array<string>> {
     const updatedSong = await this.songModel
       .findOneAndUpdate(
         { playlistId, spotifySongId },
@@ -110,7 +120,7 @@ export class SongService {
       throw new NotFoundException('Song not found.');
     }
 
-    return updatedSong.voters.length;
+    return updatedSong.voters;
   }
 
   async removeVoteToSong(
@@ -128,13 +138,13 @@ export class SongService {
     if (!updatedSong) {
       throw new NotFoundException('Song not found.');
     }
-    return updatedSong.voters.length;
+    return updatedSong.voters;
   }
 
   async getVoteCountForSong(
     playlistId: string,
     spotifySongId: string,
-  ): Promise<number> {
+  ): Promise<Array<string>> {
     const song = await this.songModel
       .findOne({ playlistId, spotifySongId })
       .exec();
@@ -143,6 +153,6 @@ export class SongService {
         `Song with spotifySongId: ${spotifySongId} was not found in playlist with playlistId ${playlistId}`,
       );
     }
-    return song.voters.length;
+    return song.voters;
   }
 }
