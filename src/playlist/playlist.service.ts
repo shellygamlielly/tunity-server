@@ -18,7 +18,8 @@ export class PlaylistService {
     return playlist.id;
   }
 
-  async removePlaylist(playlistId: string) {
+  async removePlaylist(userId: string, playlistId: string) {
+    //if userid has no such playlist permission do not remove
     await this.playlistModel.findByIdAndDelete(playlistId);
     this.songService.removeSongsFromPlaylist(playlistId);
   }

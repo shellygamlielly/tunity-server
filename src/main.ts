@@ -1,21 +1,19 @@
 import { NestFactory } from '@nestjs/core';
+import serverlessExpress from '@codegenie/serverless-express';
+import { Callback, Context, Handler } from 'aws-lambda';
 import { AppModule } from './app.module';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ValidationPipe } from '@nestjs/common';
+let server: Handler;
 
-async function bootstrap() {
+async function bootstrap_aws(): Promise<Handler> {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(new ValidationPipe());
+  await app.init();
 
-  const config = new DocumentBuilder()
-    .setTitle('Playlist example')
-    .setDescription('The playlist API description')
-    .setVersion('1.0')
-    .addTag('Tunity')
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  const expressApp = app.getHttpAdapter().getInstance();
+  return serverlessExpress({ app: expressApp });
+}
 
+async function bootstrap_local() {
+  const app = await NestFactory.create(AppModule);
   app.enableCors({
     origin: 'http://localhost:5173',
     methods: 'GET, POST, PUT, DELETE',
@@ -23,4 +21,15 @@ async function bootstrap() {
   });
   await app.listen(3000);
 }
-bootstrap();
+
+if (process.env.NODE_ENV === 'development') {
+  bootstrap_local();
+}
+export const handler: Handler = async (
+  event: any,
+  context: Context,
+  callback: Callback,
+) => {
+  server = server ?? (await bootstrap_aws());
+  return server(event, context, callback);
+};
