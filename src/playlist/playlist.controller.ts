@@ -32,8 +32,15 @@ export class PlaylistController {
   }
 
   @Post('')
-  async createPlaylist(@Body() { name }: { name: string }, @Req() req: any) {
-    return await this.playlistService.createPlaylist(req.userId, name);
+  async createPlaylist(
+    @Body() { name, imageUrl }: { name: string; imageUrl: string },
+    @Req() req: any,
+  ) {
+    return await this.playlistService.createPlaylist(
+      req.userId,
+      name,
+      imageUrl,
+    );
   }
 
   @Delete('/:playlistId')

@@ -12,6 +12,9 @@ export class Playlist {
   @Prop({ type: Types.ObjectId, required: true, ref: User.name })
   ownerId: string;
 
+  @Prop({ type: String, required: true })
+  imageUrl: string;
+
   @Prop({ type: Number })
   maxTimeSeconds: number;
 }
