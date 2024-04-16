@@ -5,12 +5,17 @@ import { CreatePlaylistDto } from '../dto/create-playlist-dto';
 import { Playlist } from 'src/schemas/playlist.schema';
 import { SongService } from 'src/song/song.service';
 import { PlaylistDto } from 'src/dto/playlist-dto';
+import { PermissionService } from 'src/permission/permission.service';
+import { CollaboratorsDto } from 'src/dto/collaborators-dto';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class PlaylistService {
   constructor(
     @InjectModel(Playlist.name) private playlistModel: Model<Playlist>,
     private readonly songService: SongService,
+    private readonly permissionService: PermissionService,
+    private readonly userService: UserService,
   ) {}
 
   async createPlaylist(
@@ -45,6 +50,22 @@ export class PlaylistService {
     };
   }
 
+  async getPlaylistCollaborators(
+    playlistId: string,
+  ): Promise<CollaboratorsDto[]> {
+    const collaborators =
+      await this.permissionService.getPlaylistCollaborators(playlistId);
+    const userIds = collaborators.map((permission) => permission.userId);
+    const emailMap = await this.userService.getUserEmailMap(userIds);
+    return collaborators.map((collaborator) => ({
+      permission: collaborator.permission,
+      playlistId: collaborator.playlistId,
+
+      userId: collaborator.userId,
+      userEmail: emailMap.get(collaborator.userId) || '',
+    }));
+  }
+
   async getPlaylistsByOwnerId(ownerId: string): Promise<CreatePlaylistDto[]> {
     const playlists = await this.playlistModel
       .find({ ownerId })
@@ -64,11 +85,22 @@ export class PlaylistService {
     }));
   }
 
-  async getPlaylistsByUserId(userId: ObjectId) {
-    //not just owner any permission
-  }
+  async getPlaylistsSharedWithUser(
+    userId: string,
+  ): Promise<CreatePlaylistDto[]> {
+    const premission = await this.permissionService.getSharedPlaylists(userId);
+    const playlistIds = premission.map((p) => p.playlistId);
 
-  async getPlaylistCollaborators(playlistId: ObjectId) {
-    //not just owner any permission
+    const playlists = await this.playlistModel.find({ playlistIds }).exec();
+    const songsCountMap =
+      await this.songService.getSongsCountForPlaylists(playlistIds);
+    return playlists.map((playlist) => ({
+      ownerId: playlist.ownerId,
+      imageUrl: playlist.imageUrl,
+      playlistId: playlist.id,
+      name: playlist.name,
+      maxTime: playlist.maxTimeSeconds,
+      songsCount: songsCountMap[playlist.id] || 0,
+    }));
   }
 }

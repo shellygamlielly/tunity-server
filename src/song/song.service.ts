@@ -9,7 +9,7 @@ export class SongService {
   constructor(@InjectModel(Song.name) private songModel: Model<Song>) {}
 
   async getSongsCountForPlaylists(
-    playlistIds: Array<ObjectId>,
+    playlistIds: Array<string>,
   ): Promise<Record<string, number>> {
     const result = await this.songModel.aggregate([
       {
@@ -41,19 +41,22 @@ export class SongService {
 
   async getSongs(playlistId: string): Promise<SongDto[]> {
     const songs = await this.songModel
-    .aggregate([
-      {$match: {
-        playlistId
-      }},
-      {
-        $addFields: {
-          votersCount: { $size: "$voters" }
-        }
-      },
-      {
-        $sort: { votersCount: -1, _id: 1 }
-    }
-    ]).exec();
+      .aggregate([
+        {
+          $match: {
+            playlistId,
+          },
+        },
+        {
+          $addFields: {
+            votersCount: { $size: '$voters' },
+          },
+        },
+        {
+          $sort: { votersCount: -1, _id: 1 },
+        },
+      ])
+      .exec();
     return songs.map((song) => ({
       spotifySongId: song.spotifySongId,
       name: song.name,

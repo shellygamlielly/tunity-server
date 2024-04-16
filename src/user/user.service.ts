@@ -6,6 +6,7 @@ import { UserDto } from '../dto/user-dto';
 
 @Injectable()
 export class UserService {
+
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
   async getUserBySpotifyId(spotifyId): Promise<UserDto> {
@@ -29,5 +30,16 @@ export class UserService {
       spotifyId: user.spotifyId,
       userId: user.id,
     };
+  }
+
+  async getUserEmailMap(userIds: string[]) {
+    const users = await this.userModel.find({ _id: { $in: userIds } });
+    const emailMap = new Map<string, string>();
+
+    users.forEach((user) => {
+      emailMap.set(user._id.toString(), user.email); 
+    });
+
+    return emailMap;
   }
 }

@@ -12,6 +12,9 @@ import { PlaylistService } from './playlist/playlist.service';
 import { SongService } from './song/song.service';
 import { MongoDBService } from './mongodb.service';
 import { AuthInterceptor } from './interceptors/auth.interceptors';
+import { PermissionController } from './permission/permission.controller';
+import { PermissionService } from './permission/permission.service';
+import { Permission, PermissionSchema } from './schemas/permission.schema';
 
 @Module({
   imports: [
@@ -24,8 +27,22 @@ import { AuthInterceptor } from './interceptors/auth.interceptors';
       { name: Playlist.name, schema: PlaylistSchema },
     ]),
     MongooseModule.forFeature([{ name: Song.name, schema: SongSchema }]),
+    MongooseModule.forFeature([
+      { name: Permission.name, schema: PermissionSchema },
+    ]),
   ],
-  controllers: [UserController, PlaylistController, SongController],
-  providers: [AuthInterceptor, UserService, PlaylistService, SongService],
+  controllers: [
+    UserController,
+    PlaylistController,
+    SongController,
+    PermissionController,
+  ],
+  providers: [
+    AuthInterceptor,
+    UserService,
+    PlaylistService,
+    SongService,
+    PermissionService,
+  ],
 })
 export class AppModule {}

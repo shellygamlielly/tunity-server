@@ -6,13 +6,13 @@ import {
   Param,
   Post,
   Req,
-  UnauthorizedException,
   UseInterceptors,
 } from '@nestjs/common';
 import { PlaylistService } from './playlist.service';
 import { CreatePlaylistDto } from '../dto/create-playlist-dto';
 import { PlaylistDto } from 'src/dto/playlist-dto';
 import { AuthInterceptor } from 'src/interceptors/auth.interceptors';
+import { CollaboratorsDto } from 'src/dto/collaborators-dto';
 
 @Controller('/playlist')
 @UseInterceptors(AuthInterceptor)
@@ -29,6 +29,19 @@ export class PlaylistController {
     @Param('playlistId') playlistId: string,
   ): Promise<PlaylistDto> {
     return await this.playlistService.getPlaylistById(playlistId);
+  }
+  @Get('/collaborators/:playlistId')
+  async getPlaylistCollaborators(
+    @Param('playlistId') playlistId: string,
+  ): Promise<CollaboratorsDto[]> {
+    return await this.playlistService.getPlaylistCollaborators(playlistId);
+  }
+
+  @Get('/shared')
+  async getPlaylistSharedWithUser(
+    @Req() req: any,
+  ): Promise<CreatePlaylistDto[]> {
+    return await this.playlistService.getPlaylistsSharedWithUser(req.userId);
   }
 
   @Post('')
