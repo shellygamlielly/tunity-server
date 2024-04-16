@@ -16,14 +16,18 @@ export class PermissionService {
     playlistId: string,
     newPermission: PermissionEnum,
   ): Promise<void> {
-    const permission = await this.permissionModel
-      .findOne({ userId, playlistId })
-      .exec();
-    if (!permission) {
+    const filter = { userId, playlistId };
+    const update = { permission: newPermission };
+
+    const updatedPermission = await this.permissionModel.findOneAndUpdate(
+      filter,
+      update,
+      { new: true }, // Return the updated document
+    );
+
+    if (!updatedPermission) {
       throw new Error('Permission not found');
     }
-    permission.permission = newPermission;
-    await permission.save();
   }
 
   async getSharedPlaylists(userId: string): Promise<Array<PermissionDto>> {

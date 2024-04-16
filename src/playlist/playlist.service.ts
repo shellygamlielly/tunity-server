@@ -31,7 +31,7 @@ export class PlaylistService {
     return playlist.id;
   }
 
-  async removePlaylist(userId: string, playlistId: string) {
+  async removePlaylist(playlistId: string) {
     //if userid has no such playlist permission do not remove
     await this.playlistModel.findByIdAndDelete(playlistId);
     this.songService.removeSongsFromPlaylist(playlistId);
@@ -42,12 +42,48 @@ export class PlaylistService {
 
     const songsInPlaylist = await this.songService.getSongs(playlistId);
     return {
+      ownerId: playlist.ownerId,
       name: playlist.name,
       playlistId: playlist.id,
       imageUrl: playlist.imageUrl,
       maxTime: playlist.maxTimeSeconds,
       songs: songsInPlaylist,
     };
+  }
+
+  async isPlaylistPublicReadOnly(playlistId: string): Promise<boolean> {
+    const playlist = await this.playlistModel.findById(playlistId);
+    return playlist.readOnlyPublic;
+  }
+
+  async setPlaylistAsPublicReadOnly(playlistId: string): Promise<void> {
+    const filter = { _id: playlistId };
+    const update = { readOnlyPublic: true };
+
+    const updatedPlaylist = await this.playlistModel.findOneAndUpdate(
+      filter,
+      update,
+      { new: true },
+    );
+
+    if (!updatedPlaylist) {
+      throw new Error('Playlist not found');
+    }
+  }
+
+  async setPlaylistAsPrivate(playlistId: string): Promise<void> {
+    const filter = { _id: playlistId };
+    const update = { readOnlyPublic: false };
+
+    const updatedPlaylist = await this.playlistModel.findOneAndUpdate(
+      filter,
+      update,
+      { new: true },
+    );
+
+    if (!updatedPlaylist) {
+      throw new Error('Playlist not found');
+    }
   }
 
   async getPlaylistCollaborators(

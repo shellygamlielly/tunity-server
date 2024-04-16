@@ -23,7 +23,7 @@ export class UserController {
   }
 
   @Post('')
-  async createUser(@Body() createUserDto: any) {
+  async createUser(@Body() createUserDto: UserDto) {
     return await this.userService.createUser(
       createUserDto.spotifyId,
       createUserDto.email,

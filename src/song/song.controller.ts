@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Req,
   UseInterceptors,
 } from '@nestjs/common';
 import { SongService } from './song.service';
@@ -29,27 +30,27 @@ export class SongController {
     return songId;
   }
 
-  @Put('/vote/:userId')
+  @Put('/vote')
   async addVoteToSong(
     @Body() songDto: SongDto,
-    @Param('userId') userId: string,
+    @Req() req: any,
   ): Promise<Array<string>> {
     return await this.songService.addVoteToSong(
       songDto.playlistId,
       songDto.spotifySongId,
-      userId,
+      req.userId,
     );
   }
 
-  @Delete('/unvote/:userId')
+  @Delete('/unvote')
   async removeVoteToSong(
     @Body() songDto: SongDto,
-    @Param('userId') userId: string,
+    @Req() req: any,
   ): Promise<Array<string>> {
     return await this.songService.removeVoteToSong(
       songDto.playlistId,
       songDto.spotifySongId,
-      userId,
+      req.userId,
     );
   }
 

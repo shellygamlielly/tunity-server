@@ -15,6 +15,9 @@ export class Playlist {
   @Prop({ type: String, required: true })
   imageUrl: string;
 
+  @Prop({ type: Boolean })
+  readOnlyPublic: boolean;
+
   @Prop({ type: Number })
   maxTimeSeconds: number;
 }

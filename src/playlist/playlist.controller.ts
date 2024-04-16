@@ -5,7 +5,9 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Req,
+  UnauthorizedException,
   UseInterceptors,
 } from '@nestjs/common';
 import { PlaylistService } from './playlist.service';
@@ -15,10 +17,10 @@ import { AuthInterceptor } from 'src/interceptors/auth.interceptors';
 import { CollaboratorsDto } from 'src/dto/collaborators-dto';
 
 @Controller('/playlist')
-@UseInterceptors(AuthInterceptor)
 export class PlaylistController {
   constructor(private readonly playlistService: PlaylistService) {}
 
+  @UseInterceptors(AuthInterceptor)
   @Get('')
   async getUserPlaylists(@Req() req: any): Promise<CreatePlaylistDto[]> {
     return await this.playlistService.getPlaylistsByOwnerId(req.userId);
@@ -30,6 +32,8 @@ export class PlaylistController {
   ): Promise<PlaylistDto> {
     return await this.playlistService.getPlaylistById(playlistId);
   }
+
+  @UseInterceptors(AuthInterceptor)
   @Get('/collaborators/:playlistId')
   async getPlaylistCollaborators(
     @Param('playlistId') playlistId: string,
@@ -37,6 +41,7 @@ export class PlaylistController {
     return await this.playlistService.getPlaylistCollaborators(playlistId);
   }
 
+  @UseInterceptors(AuthInterceptor)
   @Get('/shared')
   async getPlaylistSharedWithUser(
     @Req() req: any,
@@ -44,6 +49,7 @@ export class PlaylistController {
     return await this.playlistService.getPlaylistsSharedWithUser(req.userId);
   }
 
+  @UseInterceptors(AuthInterceptor)
   @Post('')
   async createPlaylist(
     @Body() { name, imageUrl }: { name: string; imageUrl: string },
@@ -56,11 +62,50 @@ export class PlaylistController {
     );
   }
 
-  @Delete('/:playlistId')
-  async removePlaylist(
+  @UseInterceptors(AuthInterceptor)
+  @Put('/public')
+  async setPlaylistAsPublic(
+    @Body() { playlistId }: { playlistId: string },
     @Req() req: any,
+  ) {
+    const ownerId = (await this.playlistService.getPlaylistById(playlistId))
+      .ownerId;
+    if (req.userId == ownerId) {
+      return await this.playlistService.setPlaylistAsPublicReadOnly(playlistId);
+    } else {
+      throw new UnauthorizedException(
+        'only owner can change playlist permissions.',
+      );
+    }
+  }
+
+  @UseInterceptors(AuthInterceptor)
+  @Put('/private')
+  async setPlaylistAsPrivate(
+    @Body() { playlistId }: { playlistId: string },
+    @Req() req: any,
+  ) {
+    const ownerId = (await this.playlistService.getPlaylistById(playlistId))
+      .ownerId;
+    if (req.userId == ownerId) {
+      return await this.playlistService.setPlaylistAsPrivate(playlistId);
+    } else {
+      throw new UnauthorizedException(
+        'only owner can chnage playlist permissions.',
+      );
+    }
+  }
+
+  @Get('/shared/:playlistId')
+  async isPlaylistPublicReadOnly(
     @Param('playlistId') playlistId: string,
-  ): Promise<void> {
-    await this.playlistService.removePlaylist(req.userId, playlistId);
+  ): Promise<boolean> {
+    return await this.playlistService.isPlaylistPublicReadOnly(playlistId);
+  }
+
+  @UseInterceptors(AuthInterceptor)
+  @Delete('/:playlistId')
+  async removePlaylist(@Param('playlistId') playlistId: string): Promise<void> {
+    await this.playlistService.removePlaylist(playlistId);
   }
 }
